@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-UPLOAD_FOLDER = './static'
+UPLOAD_FOLDER = './static/uploads'
 
 app.secret_key = "Cairocoders-Ednalan"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -52,9 +52,6 @@ def upload_form():
 @app.route('/', methods=['POST'])
 def upload_file():
     # * means all if need specific format then *.csv
-    list_of_files = glob.glob('.\static\*')
-    latest_file = max(list_of_files, key=os.path.getctime)
-    print(latest_file)
     if request.method == 'POST':
         filename = "da_che.xlsx"
         files = request.files.getlist('files[]')
@@ -69,8 +66,7 @@ def upload_file():
                     db.session.commit()
                 else:
                     flash('File extension not supported!')
-    content = {'file_name': filename, 'ht': '<h1>Hello</h1>'}
-
+    content = {'file_name': filename}
     return render_template('upload.html', **content)
 
 
