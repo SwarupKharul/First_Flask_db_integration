@@ -7,66 +7,73 @@ from werkzeug.utils import secure_filename
 import os
 import glob
 import urllib.request
- 
+
 app = Flask(__name__)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
- 
+
 UPLOAD_FOLDER = './static'
- 
+
 app.secret_key = "Cairocoders-Ednalan"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
- 
-app.config['SQLALCHEMY_DATABASE_URI'] ='mysql://root:''@localhost/tryfirstdb'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:''@localhost/tryfirstdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 
 db = SQLAlchemy(app)
-manager = Manager(app) 
+manager = Manager(app)
 migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)
 
 
-#our model
+# our model
 class UploadInfo(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(100), unique = False)
- 
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=False)
+
     def __init__(self, name):
         self.name = name
 
- 
+
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx'])
- 
+
+
 def allowed_file(filename):
- return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-  
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 @app.route('/')
 def upload_form():
- return render_template('upload.html')
- 
+    return render_template('upload.html')
+
+
 @app.route('/', methods=['POST'])
 def upload_file():
-    list_of_files = glob.glob('.\static\*') # * means all if need specific format then *.csv
+    # * means all if need specific format then *.csv
+    list_of_files = glob.glob('.\static\*')
     latest_file = max(list_of_files, key=os.path.getctime)
     print(latest_file)
     if request.method == 'POST':
-        filename="da_che.xlsx"
+        filename = "da_che.xlsx"
         files = request.files.getlist('files[]')
         for file in files:
             if file:
                 if allowed_file(file.filename):
                     filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    file.save(os.path.join(
+                        app.config['UPLOAD_FOLDER'], filename))
                     info = UploadInfo(name=filename)
                     db.session.add(info)
                     db.session.commit()
                 else:
                     flash('File extension not supported!')
-    content = {'file_name':filename,'ht':'<h1>Hello</h1>'}
+    content = {'file_name': filename, 'ht': '<h1>Hello</h1>'}
 
     return render_template('upload.html', **content)
-   
+
+
 if __name__ == '__main__':
+    app.debug = True
     manager.run()
