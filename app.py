@@ -1,14 +1,13 @@
 import glob
 import os
 import urllib.request
-
+import time
 from check import check_file, update_file
 from flask import Flask, flash, redirect, render_template, request
 from flask_migrate import Migrate, MigrateCommand
 from flask_mysqldb import MySQL
 from flask_script import Manager
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
@@ -21,6 +20,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx'])
+prev = "format.csv"
 
 
 def allowed_file(filename):
@@ -34,20 +34,24 @@ def upload_form():
 
 @app.route('/', methods=['POST'])
 def upload_file():
+    global prev
     files = request.files.getlist('files[]')
     for file in files:
         if file:
             if allowed_file(file.filename):
-                filename = secure_filename(file.filename)
+                filename = time.strftime("%Y%m%d-%H%M%S")
+                filename += "_unprocessed.csv"
                 file.save(os.path.join(
                     app.config['UPLOAD_FOLDER'], filename))
                 if not check_file(filename):
                     flash("Improper format")
                     os.remove(os.path.join(
                         app.config['UPLOAD_FOLDER'], filename))
+                else:
+                    update_file(filename, prev)
             else:
                 flash('File extension not supported!')
-        update_file(filename)
+        prev = filename
     return redirect('/')
 
 

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import glob
 import os.path
 
@@ -21,9 +22,10 @@ def check_file(filename):
     return file_valid
 
 
-def update_file(filename):
+def update_file(filename, prev):
     df = pd.read_csv(path+str(filename))
-    os.chdir(path)
-    files = sorted(os.listdir(os.getcwd()), key=os.path.getmtime)
-    os.chdir(os.getcwd())
-    df_latest = pd.read_csv(str(files[-2]))
+    df_prev = pd.read_csv(path+str(prev))
+    df = pd.concat([df, df_prev]).drop_duplicates(keep=False)
+    os.remove(path + str(filename))
+    df.to_csv(path+str(filename), index=False)
+    print(df)
