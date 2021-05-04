@@ -4,8 +4,6 @@ import urllib.request
 import time
 from check import check_file, update_file
 from flask import Flask, flash, redirect, render_template, request
-from flask_migrate import Migrate, MigrateCommand
-from flask_mysqldb import MySQL
 from flask_script import Manager
 from flask_sqlalchemy import SQLAlchemy
 
@@ -17,6 +15,9 @@ UPLOAD_FOLDER = './static/uploads'
 app.secret_key = "Cairocoders-Ednalan"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['ENV'] = 'development'
+app.config['DEBUG'] = True
+app.config['TESTING'] = True
 
 
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx'])
@@ -36,11 +37,13 @@ def upload_form():
 def upload_file():
     global prev
     files = request.files.getlist('files[]')
+    WL1 = request.form.get("WL1")
+    WL2 = request.form.get("WL2")
     for file in files:
         if file:
             if allowed_file(file.filename):
                 filename = time.strftime("%Y%m%d-%H%M%S")
-                filename += "_unprocessed.csv"
+                filename += "_unprocessed_"+"WL1_"+WL1+"_WL2_"+WL2+".csv"
                 file.save(os.path.join(
                     app.config['UPLOAD_FOLDER'], filename))
                 if not check_file(filename):
@@ -62,4 +65,6 @@ def upload_file():
 
 
 if __name__ == '__main__':
+
+    app.debug = True
     app.run(debug=True)
