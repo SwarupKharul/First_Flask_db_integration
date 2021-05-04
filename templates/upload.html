@@ -36,6 +36,25 @@
             <span class="input-group-addon m-2">Withdraw Limit 2 </span>
             <input id="WL2" type="number" class="form-control ml-2" name="WL2" placeholder="Withdraw Limit 2">
           </div>
+          <div class="input-group">
+            <span class="input-group-addon m-2">File Type</span>
+            <select class="form-control" id="fileOption" name="File Option">
+              <option value="SSRS Processed File">SSRS Processed File</option>
+              <option value="SSRS Pending Withdrawl">SSRS Pending Withdrawl</option>
+              <option value="Payment Gateway Processed File">Payment Gateway Processed File</option>
+              <option value="Bank Reverse report">Bank Reverse report</option>
+              <option value="Daily Bank Reverse file">Daily Bank Reverse file</option>
+            </select>
+          </div>
+          <div class="input-group m-2" id="bank" style="display: none;">
+            <span class="input-group-addon m-2">Bank Name</span>
+            <select class="form-control" id="fileOption" name="File Option">
+              <option value="submit">SBI</option>
+              <option value="HDFC">HDFC</option>
+              <option value="ICICI">ICICI</option>
+              <option value="BOM">BOM</option>
+            </select>
+          </div>
         </div>
       </div>
       <div class="form-group">
@@ -49,5 +68,14 @@
 
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+  <script>
+    $('#fileOption').on('change', function() {
+  if(this.value == "Bank Reverse report" || this.value == "Daily Bank Reverse file") {
+    $('#bank').show();
+  } else {
+    $('#bank').hide();
+  }
+});
+  </script>
   </body>
 </html>
