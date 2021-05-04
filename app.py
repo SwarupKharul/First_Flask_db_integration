@@ -51,17 +51,11 @@ def upload_file():
                     os.remove(os.path.join(
                         app.config['UPLOAD_FOLDER'], filename))
                 else:
-                    update_file(filename, prev)
+                    update_file(filename)
             else:
                 flash('File extension not supported!')
         prev = filename
     return redirect('/')
-
-
-# @app.route('/table/')
-# def table():
-#     content = {'data': data}
-#     return render_template('table.html', **content)
 
 
 if __name__ == '__main__':

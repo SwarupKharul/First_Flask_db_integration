@@ -4,7 +4,7 @@ import glob
 import os.path
 
 path = './static/uploads/'
-df_req = pd.read_csv("./static/uploads/format.csv")
+df_req = pd.read_csv("./static/uploads/20000000-format.csv")
 df_req = list(df_req.columns)
 
 
@@ -22,10 +22,14 @@ def check_file(filename):
     return file_valid
 
 
-def update_file(filename, prev):
+def update_file(filename):
     df = pd.read_csv(path+str(filename))
+    print(df)
+    prev = sorted(os.listdir(path), reverse=True)
+    print(prev)
+    prev = prev[1]
     df_prev = pd.read_csv(path+str(prev))
     df = pd.concat([df, df_prev]).drop_duplicates(keep=False)
+    print(df_prev)
     os.remove(path + str(filename))
     df.to_csv(path+str(filename), index=False)
-    print(df)
